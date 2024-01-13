@@ -4,12 +4,13 @@
 
 #include <string.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include "debug_trace.h"
+#include "gbl_console.h"
+#include "gbl_stdio.h"
+#include "gbl_string.h"
 
-#include "debug_and_trace.h"
-#include "api.h"
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -152,7 +153,7 @@ static bool rx_set_log_level(api_message_t *in, api_message_t *out)
 
 	out->length = 0;
 
-	return SUCCESS;
+	return true;
 }
 
 static bool rx_event_dlt(api_message_t *in, api_message_t *out)
@@ -172,9 +173,9 @@ static bool rx_event_dlt(api_message_t *in, api_message_t *out)
 	// clear log
 	log.read_idx = log.write_idx;
 
-	return SUCCESS;
+	return true;
 #endif
-	return FAIL;
+	return false;
 }
 
 static bool rx_get_dlt_log_level(api_message_t *in, api_message_t *out)
@@ -188,7 +189,7 @@ static bool rx_get_dlt_log_level(api_message_t *in, api_message_t *out)
 	out->message[2] = (uint8_t)target->log_level;
 	out->length = 3;
 
-	return SUCCESS;
+	return true;
 }
 
 /****************************************************************************
@@ -206,7 +207,7 @@ void debug_and_trace_init(void)
 void register_debug_and_trace(uint8_t app_id, uint8_t context_id)
 {
 	static uint8_t i = 0;
-	assert(i < MAX_MODULE_NUM);
+	// assert(i < MAX_MODULE_NUM);
 
 	log_manager[i].app_id = app_id;
 	log_manager[i].context_id = context_id;
@@ -220,7 +221,7 @@ DEBUG_AND_TRACE_HANDLER search_debug_handler(uint8_t command)
 			return debug_and_trace_handler[i].handler;
 		}
 	}
-	assert(0);
+	// assert(0);
 	return NULL;
 }
 
@@ -232,7 +233,7 @@ bool sys_log(uint8_t log_level, uint8_t app_id, uint8_t context_id, const char *
 
 	struct log_manager_s *target = search_manager(app_id, context_id);
 	if (target == NULL) {
-		return FAIL;
+		return false;
 	}
 
 	buf = (char *)&target->dlt_log[0].base;
@@ -267,7 +268,7 @@ bool sys_log(uint8_t log_level, uint8_t app_id, uint8_t context_id, const char *
 				     extension_header_ptr->nbyte + len);
 	}
 
-	return SUCCESS;
+	return true;
 // Use buffer
 #if 0
 	for (uint8_t i = 0; i < MAX_MODULE_NUM; ++i) {
@@ -308,10 +309,10 @@ bool sys_log(uint8_t log_level, uint8_t app_id, uint8_t context_id, const char *
 				sizeof(struct extension_header_s) + extension_header_ptr->nbyte + strlen(content_start);
 			log_manager[i].curr_log_idx = (log_manager[i].curr_log_idx + 1) % LOG_BUF_SIZE;
 
-			return SUCCESS;
+			return true;
 		}
 	}
-	return FAIL;
+	return false;
 #endif
 }
 
@@ -378,12 +379,12 @@ bool tx_event_dlt(uint32_t time_stamp, uint8_t log_level, uint8_t *msg, uint16_t
 
 	return gdcn_api_send(DEBUG_AND_TRACE_CHANNEL, EVENT_DLT, playload, idx);
 #endif
-	return FAIL;
+	return false;
 }
 
 bool rx_send_event_dlt(void)
 {
-	return FAIL;
+	return false;
 #if 0
 	uint8_t buf[4096];
 	uint16_t offset=0;
@@ -408,7 +409,7 @@ bool tx_get_dlt_log_level(uint8_t app_id, uint8_t context_id)
 	struct log_manager_s *target = search_manager(app_id, context_id);
 
 	if (target == NULL) {
-		return FAIL;
+		return false;
 	}
 
 	struct base_header_s *base_header_ptr = (struct base_header_s *)playload;
@@ -428,15 +429,73 @@ bool tx_get_dlt_log_level(uint8_t app_id, uint8_t context_id)
 
 bool tx_set_enable_event_trace(void)
 {
-	return FAIL;
+	return false;
 }
 
 bool tx_set_disable_event_trace(void)
 {
-	return SUCCESS;
+	return true;
 }
 
 bool tx_get_event_trace(void)
 {
-	return FAIL;
+	return false;
 }
+
+bool gdcn_api_send(uint8_t channel, uint8_t command_id, uint8_t *playload, uint8_t size)
+{
+    return true;
+}
+
+uint8_t debug_trace_init(void)
+{
+    printf("debug_trace_init\n");
+}
+uint8_t debug_trace_loop(void)
+{
+    printf("debug_trace_loop\n");
+}
+bool debug_trace_console(int argc, char *argv[])
+{
+    if (argc < 2)
+        return false;
+
+    if (STRNCMP(argv[0], "dt"))
+        return false;
+
+    if (!STRNCMP(argv[1], "help"))
+    {
+        printf("dt r [page] [addr]\n");
+        printf("dt w [page] [addr] [val]\n");
+        printf("dt link\n");
+        printf("dt rssi\n");
+    }
+    // else if (!STRNCMP(argv[1], "r") && (argc == 4))
+    // {
+    //     uint8_t page = strtol(argv[2], NULL, 16);
+    //     uint16_t addr = strtol(argv[3], NULL, 16);
+    //     uint32_t abs_addr = APIX3_BASEADDR | (page << 9) | (addr);
+    //     uint8_t ret = reg_rd(page, addr, false);
+    //     printf("reg_rd page 0x%02X, addr 0x%04X, abs_addr 0x%08X, value: 0x%02X\n", page, addr, abs_addr, ret);
+    // }
+    // else if (!STRNCMP(argv[1], "w") && (argc == 5))
+    // {
+    //     uint8_t page = strtol(argv[2], NULL, 16);
+    //     uint16_t addr = strtol(argv[3], NULL, 16);
+    //     uint8_t val = strtol(argv[4], NULL, 16);
+    //     uint32_t abs_addr = APIX3_BASEADDR | (page << 9) | (addr);
+    //     reg_wr(page, addr, val);
+    //     printf("reg_wr page 0x%02X, addr 0x%04X, abs_addr 0x%08X, value: 0x%02X\n", page, addr, abs_addr, val);
+    // }
+    else if (!STRNCMP(argv[1], "test"))
+    {
+        printf("debug_trace_console test\n");
+    }
+    else
+    {
+        return false;
+    }
+
+    return true;
+}
+

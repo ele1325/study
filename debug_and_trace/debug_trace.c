@@ -444,12 +444,18 @@ bool tx_get_event_trace(void)
 
 bool gdcn_api_send(uint8_t channel, uint8_t command_id, uint8_t *playload, uint8_t size)
 {
+    printf("channel:%d, command_id:%d, buf:%s, size:%d\n", channel, command_id, playload, size);
     return true;
 }
 
 uint8_t debug_trace_init(void)
 {
+    debug_and_trace_init();
     printf("debug_trace_init\n");
+    register_debug_and_trace(1, 2);
+    uint8_t buf[] = "12345";
+    printf("size :%d\n", sizeof(buf));
+    LOG_INFO(1, 2, buf, sizeof(buf));
 }
 uint8_t debug_trace_loop(void)
 {

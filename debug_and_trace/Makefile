@@ -34,14 +34,16 @@ CFLAGS += -I. \
 CFLAGS += -DDEBUG_ENABLE -g # GDB
 
 # $(output_path)/$(target): $(output_files)
-# run the target after make
+
 $(target): $(output_files)
 	$(CC) -o $@ $^
-	./$(target)
 
 $(output_path)/%.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@ 
+
+run:
+	./$(target)
 
 clean:
 	rm -rf $(output_path)

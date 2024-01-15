@@ -5,6 +5,48 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef enum
+{
+    TEST = 0,
+    BTLD,
+    OSYS,
+    GDCN,
+    LINK,
+    WARP,
+    FLSH,
+    TOCH,
+    DIBL,
+    SAFE,
+    PERI,
+    MISC,
+    MAX_MODULE_NUM
+} CONTEXT_ID_E;
+
+// LOG LEVEL
+#define LOG_LEVEL_NONE 0x00
+#define LOG_LEVEL_FATA 0x01
+#define LOG_LEVEL_ERRO 0x02
+#define LOG_LEVEL_WARN 0x03
+#define LOG_LEVEL_INFO 0x04
+#define LOG_LEVEL_DEBU 0x05
+#define LOG_LEVEL_VERB 0x06
+#define LOG_LEVEL_DEFA LOG_LEVEL_WARN
+
+#define LOG_FATA(context_id, data, len) logging(context_id, LOG_LEVEL_FATA, data, len)
+#define LOG_ERRO(context_id, data, len) logging(context_id, LOG_LEVEL_ERRO, data, len)
+#define LOG_WARN(context_id, data, len) logging(context_id, LOG_LEVEL_WARN, data, len)
+#define LOG_INFO(context_id, data, len) logging(context_id, LOG_LEVEL_INFO, data, len)
+#define LOG_DEBU(context_id, data, len) logging(context_id, LOG_LEVEL_DEBU, data, len)
+#define LOG_VERB(context_id, data, len) logging(context_id, LOG_LEVEL_VERB, data, len)
+
+// log level, MSTP is set as 0x0
+// #define LOG_FATA(APP_ID, CONTEXT_ID, buffer, len) sys_log(LOG_LEVEL_FATA, APP_ID, CONTEXT_ID, buffer, len)
+// #define LOG_ERRO(APP_ID, CONTEXT_ID, buffer, len) sys_log(LOG_LEVEL_ERRO, APP_ID, CONTEXT_ID, buffer, len)
+// #define LOG_WARN(APP_ID, CONTEXT_ID, buffer, len) sys_log(LOG_LEVEL_WARN, APP_ID, CONTEXT_ID, buffer, len)
+// #define LOG_INFO(APP_ID, CONTEXT_ID, buffer, len) sys_log(LOG_LEVEL_INFO, APP_ID, CONTEXT_ID, buffer, len)
+// #define LOG_DEBU(APP_ID, CONTEXT_ID, buffer, len) sys_log(LOG_LEVEL_DEBU, APP_ID, CONTEXT_ID, buffer, len)
+// #define LOG_VERB(APP_ID, CONTEXT_ID, buffer, len) sys_log(LOG_LEVEL_VERB, APP_ID, CONTEXT_ID, buffer, len)
+
 #define LOG_BUF_SIZE 256
 #define DEBUG_PLAYLOAD 1024
 
@@ -42,15 +84,6 @@
 #define DLT_TYPE_NW_TRACE (0x2 << MSTP_SHITF)
 #define DLT_TYPE_CONTROL (0x3 << MSTP_SHITF)
 
-// log level, MSTP is set as 0x0
-#define DLT_LOG_FATAL 0x01
-#define DLT_LOG_ERROR 0x02
-#define DLT_LOG_WARNING 0x03
-#define DLT_LOG_INFO 0x04
-#define DLT_LOG_DEBUG 0x05
-#define DLT_LOG_VERBOSE 0x06
-#define DLT_LOG_DEFAULT_LEVEL DLT_LOG_INFO
-
 // trace message
 #define DLT_TRACE_VARIABLE 0x1
 #define DLT_TRACE_FUNCTION_IN 0x2
@@ -71,20 +104,7 @@
 #define DLT_CONTROL_RESPONSE 0x2
 // #define 0x3-0xF: Reserved
 
-// log level, MSTP is set as 0x0
-#define LOG_FATAL(APP_ID, CONTEXT_ID, buffer, len) sys_log(DLT_LOG_FATAL, APP_ID, CONTEXT_ID, buffer, len)
-#define LOG_ERROR(APP_ID, CONTEXT_ID, buffer, len) sys_log(DLT_LOG_ERROR, APP_ID, CONTEXT_ID, buffer, len)
-#define LOG_WARNING(APP_ID, CONTEXT_ID, buffer, len) sys_log(DLT_LOG_WARNING, APP_ID, CONTEXT_ID, buffer, len)
-#define LOG_INFO(APP_ID, CONTEXT_ID, buffer, len) sys_log(DLT_LOG_INFO, APP_ID, CONTEXT_ID, buffer, len)
-#define LOG_DEBUG(APP_ID, CONTEXT_ID, buffer, len) sys_log(DLT_LOG_DEBUG, APP_ID, CONTEXT_ID, buffer, len)
-#define LOG_VERBOSE(APP_ID, CONTEXT_ID, buffer, len) sys_log(DLT_LOG_VERBOSE, APP_ID, CONTEXT_ID, buffer, len)
 
-#define DLT_LOG_FATAL 0x01
-#define DLT_LOG_ERROR 0x02
-#define DLT_LOG_WARNING 0x03
-#define DLT_LOG_INFO 0x04
-#define DLT_LOG_DEBUG 0x05
-#define DLT_LOG_VERBOSE 0x06
 
 typedef bool (*DEBUG_AND_TRACE_HANDLER)(api_message_t *, api_message_t *);
 
@@ -95,7 +115,8 @@ struct debug_and_trace_channel_s {
 typedef struct debug_and_trace_channel_s debug_and_trace_channel_t;
 
 // open api
-void register_debug_and_trace(uint8_t app_id, uint8_t context_id);
+void dlt_register(void);
+uint8_t dlt_set_log_level(uint32_t app_id, uint32_t context_id, uint8_t log_level);
 void debug_and_trace_init(void);
 bool sys_log(uint8_t log_level, uint8_t app_id, uint8_t context_id, const char *input_buf, const uint16_t len);
 bool tx_set_log_level(uint32_t app_id, uint32_t context_id, uint8_t new_log_level);

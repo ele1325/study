@@ -1,0 +1,25 @@
+3.7.3 Requirements Display
+ID: Debug_89
+The display software shall implement a log message filter mechanism to only transfer messages with a loglevel 
+smaller or equal the "pass-through loglevel" defined for the display context.
+ID: Debug_114
+The display software shall set the pass-through log level to the default value ERROR on startup.
+ID: Debug_115
+The display software shall adapt the pass-through loglevel on reception of SET_DLT_LOGLEVEL message.
+ID: Debug_90
+The concrete set of messages for each loglevel, their content and their frequency shall be discussed with and approved by BMW.
+ID: Debug_91
+Message content must be decodable by BMW so that the content is human readable. A fibex file shall be provided 
+so that message content can be decoded by DLT viewer.
+ID: Debug_92
+Communication shall be abstracted in a way that display specific functionality is implemented on display hardware.
+ID: Debug_93
+The implementation of this high-level protocol on display side shall be part of the supplier's delivery and is in his responsibility.
+ID: Debug_131
+Provide concept outlining how to implement event tracing as described in chapter 2 and 3
+The concept shall indicate which events will be captured, how long the events might be captured and how the captured data will be analyzed on developer system.
+ID: Debug_132
+Provide a proposal how to implement debugging during startup, shutdown and before software controlled reset of the display as described in chapter 2.
+ID: Debug_133
+Provide concept on how to implement triggering of system behavior in critical system states as described in chapter 2.
+The proposal shall indicate which system states will be triggerable and which additional protocol messages are required.

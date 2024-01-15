@@ -1,5 +1,5 @@
-#ifndef DEBUG_TRACE_CFG_H
-#define DEBUG_TRACE_CFG_H
+#ifndef DLT__CFG_H
+#define DLT__CFG_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -27,4 +27,4 @@ struct uint8_t  gdcn_echo(struct uint8_t  command);
 struct uint8_t  device_management(struct uint8_t  command);
 struct uint8_t  firmware_flash(struct uint8_t  command);
 
-#endif /*DEBUG_TRACE_CFG_H*/
+#endif /*DLT__CFG_H*/

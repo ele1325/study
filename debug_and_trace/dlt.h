@@ -1,7 +1,7 @@
-#ifndef DEBUG_TRACE_H
-#define DEBUG_TRACE_H
+#ifndef DLT_H
+#define DLT_H
 
-#include "debug_trace_cfg.h"
+#include "dlt_cfg.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -106,8 +106,8 @@ bool tx_set_disable_event_trace(void);
 bool tx_get_event_trace(void);
 bool rx_send_event_dlt(void);
 DEBUG_AND_TRACE_HANDLER search_debug_handler(uint8_t command);
-uint8_t debug_trace_init(void);
-uint8_t debug_trace_loop(void);
-bool debug_trace_console(int argc, char *argv[]);
+uint8_t dlt_init(void);
+uint8_t dlt_loop(void);
+bool dlt_console(int argc, char *argv[]);
 
-#endif /*DEBUG_TRACE_H*/
+#endif /*DLT_H*/

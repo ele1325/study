@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include "debug_trace.h"
+#include "dlt.h"
 #include "gbl_console.h"
 #include "gbl_stdio.h"
 #include "gbl_string.h"
@@ -448,33 +448,33 @@ bool gdcn_api_send(uint8_t channel, uint8_t command_id, uint8_t *playload, uint8
     return true;
 }
 
-uint8_t debug_trace_init(void)
+uint8_t dlt_init(void)
 {
     debug_and_trace_init();
-    printf("debug_trace_init\n");
+    printf("dlt_init\n");
     register_debug_and_trace(1, 2);
     uint8_t buf[] = "12345";
     printf("size :%d\n", sizeof(buf));
     LOG_INFO(1, 2, buf, sizeof(buf));
 }
-uint8_t debug_trace_loop(void)
+uint8_t dlt_loop(void)
 {
-    printf("debug_trace_loop\n");
+    printf("dlt_loop\n");
 }
-bool debug_trace_console(int argc, char *argv[])
+bool dlt_console(int argc, char *argv[])
 {
     if (argc < 2)
         return false;
 
-    if (STRNCMP(argv[0], "dt"))
+    if (STRNCMP(argv[0], "dlt"))
         return false;
 
     if (!STRNCMP(argv[1], "help"))
     {
-        printf("dt r [page] [addr]\n");
-        printf("dt w [page] [addr] [val]\n");
-        printf("dt link\n");
-        printf("dt rssi\n");
+        printf("dlt r [page] [addr]\n");
+        printf("dlt w [page] [addr] [val]\n");
+        printf("dlt link\n");
+        printf("dlt rssi\n");
     }
     // else if (!STRNCMP(argv[1], "r") && (argc == 4))
     // {
@@ -495,7 +495,7 @@ bool debug_trace_console(int argc, char *argv[])
     // }
     else if (!STRNCMP(argv[1], "test"))
     {
-        printf("debug_trace_console test\n");
+        printf("dlt_console test\n");
     }
     else
     {

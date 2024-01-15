@@ -18,7 +18,7 @@ endef
 # ------------------------------------------------------------------------------
 # 
 
-target = dt
+target = dlt
 
 source_path = . 
 output_path = build
@@ -33,9 +33,7 @@ CFLAGS += -I. \
 
 CFLAGS += -DDEBUG_ENABLE -g # GDB
 
-# $(output_path)/$(target): $(output_files)
-
-$(target): $(output_files)
+$(output_path)/$(target): $(output_files)
 	$(CC) -o $@ $^
 
 $(output_path)/%.o: %.c
@@ -43,8 +41,7 @@ $(output_path)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
 run:
-	./$(target)
+	$(output_path)/$(target)
 
 clean:
 	rm -rf $(output_path)
-	rm $(target)

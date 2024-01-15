@@ -1,30 +1,13 @@
 #ifndef DLT__CFG_H
 #define DLT__CFG_H
 
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-//TODO
-#define PLAYLOAD_SIZE (8)
-#define DEBUG_AND_TRACE_CHANNEL (0x60)
+#include "gbl_console.h"
+#include "gbl_stdio.h"
+#include "gbl_string.h"
+#include "dlt_cfg.h"
 
-struct api_message_s {
-	char message[PLAYLOAD_SIZE];
-	uint16_t length;
-};
-typedef struct api_message_s api_message_t;
-
-// Timer and retry
-#define RETRY_TIMES 2
-#define TIMEOUT 100
-
-// void gdcn_api_init(void);
-bool gdcn_api_send(uint8_t channel, uint8_t command_id, uint8_t *playload, uint8_t size);
-// void gdcn_api_timer_increment(void);
-
-// struct uint8_t  gdcn_connect(struct uint8_t  command);
-// struct uint8_t  gdcn_echo(struct uint8_t  command);
-
-// struct uint8_t  device_management(struct uint8_t  command);
-// struct uint8_t  firmware_flash(struct uint8_t  command);
 
 #endif /*DLT__CFG_H*/

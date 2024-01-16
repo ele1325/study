@@ -19,6 +19,6 @@ int main(void)
 
             dlt_console(argc, argv);
         }
-        // dlt_loop();
+        dlt_loop();
     }
 }

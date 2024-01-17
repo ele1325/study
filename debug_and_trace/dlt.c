@@ -5,55 +5,70 @@
 #include "dlt.h"
 #include "gbl_rb.h"
 
-/****************************************************************************
- * Pre-processor Definitions
- ****************************************************************************/
-#define APPLICATION_ID (1)
 #define MESSAGE_ID (0x55AA55AA)
 #define PAYLOAD_SIZE (100)
 #define LOG_BUFFER_SIZE (10)
+#define PRE_PAYLOAD_SIZE (5) /*timestamp 4byte + context+level 1byte*/
+#define BUFFER_FULL_MSG "log buffer is full!!"
 gbl_rb_t log_rb;
-
 
 typedef struct dlt_log
 {
     uint32_t timestamp;
     uint8_t context_id : 4; /*[3:0]*/
-    uint8_t level : 4; /*[7:4]*/
+    uint8_t level : 4;      /*[7:4]*/
     uint8_t payload[PAYLOAD_SIZE];
     uint16_t len;
 } __attribute__((packed)) dlt_log_t;
 
 dlt_log_t log_buffer[LOG_BUFFER_SIZE];
-dlt_log_t log_group[MAX_MODULE_NUM];
-static dlt_log_t *log_group_search(uint8_t context_id);
+
+uint8_t level_cfg[MAX_MODULE_NUM];
+
 uint8_t busyflag = 1;
 
 void dlt_register(void)
 {
     for (uint8_t i = 0; i < MAX_MODULE_NUM; i++)
     {
-        log_group[i].context_id = i;
-        log_group[i].level = LOG_LEVEL_DEFA;
+        level_cfg[i] = LOG_LEVEL_DEFA;
     }
+}
+
+uint8_t dlt_level_set(uint32_t context_id, uint8_t level)
+{
+    level_cfg[context_id] = level;
 }
 
 uint8_t dlt_store(uint8_t *data)
 {
-    gbl_rb_write(&log_rb, data, 1, true);
-    return 1;
+    uint8_t ret = 0;
+    if (gbl_rb_remain(&log_rb) > 1)
+    {
+        ret = gbl_rb_write(&log_rb, data, 1, true);
+        if (ret != 1)
+            printf("gbl_rb_write fail:%d\n", ret);
+    }
+    else
+    {
+        dlt_log_t full_log = {
+            .timestamp = gbl_mclocker(),
+            .context_id = 1,
+            .level = 1,
+            .payload = BUFFER_FULL_MSG,
+            .len = sizeof(BUFFER_FULL_MSG),
+        };
+        ret = gbl_rb_write(&log_rb, (uint8_t *)&full_log, 1, true);
+        if (ret != 1)
+            printf("gbl_rb_write fail:%d\n", ret);
+    }
+    return ret;
 }
 
 uint8_t dlt_restore(uint8_t *data)
 {
     gbl_rb_read(&log_rb, data, 1, true);
     return 1;
-}
-
-uint8_t dlt_level_set(uint32_t context_id, uint8_t level)
-{
-    dlt_log_t *target = log_group_search(context_id);
-    target->level = level;
 }
 
 typedef void *gdcn_core_handle_t;
@@ -65,50 +80,37 @@ __attribute__((weak)) void display_EVENT_DLT(gdcn_core_handle_t gdcn_handle, uin
     {
         printf("%02X ", data[i]);
     }
-    printf("%s\n", &data[5]);
-}
-
-static dlt_log_t *log_group_search(uint8_t context_id)
-{
-    for (uint8_t i = 0; i < MAX_MODULE_NUM; ++i)
-    {
-        if (log_group[i].context_id == context_id)
-        {
-            return &log_group[i];
-        }
-    }
-    return NULL;
+    printf("%s\n", &data[PRE_PAYLOAD_SIZE]);
 }
 
 bool logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len)
 {
-    dlt_log_t log;
-    log.timestamp = gbl_mclocker(); //TODO: MSB or LSB?
-    log.context_id = context_id;
-    log.level = level;    
-    log.len = len;
-    memset(log.payload, 0, PAYLOAD_SIZE);
-    memcpy(log.payload, data, len);
-    // uint8_t temp[sizeof(dlt_log_t) + len];
-    dlt_log_t *target = log_group_search(context_id);
-    if (target == NULL)
+
+    // dlt_log_t *target = log_group_search(context_id);
+    if (context_id >= MAX_MODULE_NUM)
     {
         return false;
     }
 
-    // memcpy(&temp[0], &log, sizeof(log));
-    // memcpy(&temp[sizeof(log)], data, len);
-
-    if (target->level >= level)
+    if (level <= level_cfg[context_id])
     {
-        if(busyflag == 0)
+        dlt_log_t log = {
+            .timestamp = gbl_mclocker(), // TODO: 0.1ms
+            .context_id = context_id,
+            .level = level,
+            .len = len,
+        };
+        memset(log.payload, 0, PAYLOAD_SIZE);
+        memcpy(log.payload, data, len);
+
+        if (busyflag == 0)
         {
             gdcn_core_handle_t gdcn_handle;
-            display_EVENT_DLT(gdcn_handle, MESSAGE_ID, (uint8_t*)&log, log.len + 5);
+            display_EVENT_DLT(gdcn_handle, MESSAGE_ID, (uint8_t *)&log, log.len + PRE_PAYLOAD_SIZE);
         }
         else
         {
-            dlt_store((uint8_t*)&log);
+            dlt_store((uint8_t *)&log);
         }
     }
     return true;
@@ -116,20 +118,19 @@ bool logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len)
 
 uint8_t dlt_init(void)
 {
-    if(gbl_rb_init(&log_rb, log_buffer, LOG_BUFFER_SIZE * sizeof(dlt_log_t), LOG_BUFFER_SIZE, sizeof(dlt_log_t))!=0)
+    if (gbl_rb_init(&log_rb, log_buffer, LOG_BUFFER_SIZE * sizeof(dlt_log_t), LOG_BUFFER_SIZE, sizeof(dlt_log_t)) != 0)
         printf("gbl_rb_init fail\n");
     printf("dlt_init\n");
-    memset(log_group, 0, sizeof(log_group));
     dlt_register();
 }
 uint8_t dlt_loop(void)
 {
-    if(!gbl_rb_is_empty(&log_rb) && busyflag == 0)
+    if (!gbl_rb_is_empty(&log_rb) && busyflag == 0)
     {
         dlt_log_t log;
         dlt_restore((uint8_t *)&log);
         gdcn_core_handle_t gdcn_handle;
-        display_EVENT_DLT(gdcn_handle, MESSAGE_ID, (uint8_t *)&log, log.len + 5);
+        display_EVENT_DLT(gdcn_handle, MESSAGE_ID, (uint8_t *)&log, log.len + PRE_PAYLOAD_SIZE);
     }
 }
 bool dlt_console(int argc, char *argv[])
@@ -172,6 +173,10 @@ bool dlt_console(int argc, char *argv[])
         uint8_t val = strtol(argv[2], NULL, 16);
         busyflag = val;
         printf("busyflag:%d\n", busyflag);
+    }
+    else if (!STRNCMP(argv[1], "full"))
+    {
+        printf("full:%d\n", gbl_rb_is_full(&log_rb));
     }
     else if (!STRNCMP(argv[1], "test"))
     {

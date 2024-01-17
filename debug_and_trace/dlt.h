@@ -15,18 +15,18 @@
 typedef enum
 {
     TEST = 0,
-    BTLD,
-    OSYS,
-    GDCN,
-    LINK,
-    WARP,
-    FLSH,
-    TOCH,
-    DIBL,
-    SAFE,
-    PERI,
-    MISC,
-    MAX_MODULE_NUM
+    BTLD = 1,
+    OSYS = 2,
+    GDCN = 3,
+    LINK = 4,
+    WARP = 5,
+    FLSH = 6,
+    TOCH = 7,
+    DIBL = 8,
+    SAFE = 9,
+    PERI = 10,
+    MISC = 11,
+    MAX_MODULE_NUM,
 } CONTEXT_ID_E;
 
 // LOG LEVEL

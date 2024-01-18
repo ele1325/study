@@ -6,8 +6,6 @@
 #include "gbl_rb.h"
 
 #define MESSAGE_ID (0x55AA55AA)
-#define PAYLOAD_SIZE (100)
-#define LOG_BUFFER_SIZE (10)
 #define PRE_PAYLOAD_SIZE (5) /*timestamp 4byte + context+level 1byte*/
 #define BUFFER_FULL_MSG "log buffer is full!!"
 gbl_rb_t log_rb;
@@ -23,13 +21,13 @@ typedef struct dlt_log
 
 dlt_log_t log_buffer[LOG_BUFFER_SIZE];
 
-uint8_t level_cfg[MAX_MODULE_NUM];
+uint8_t level_cfg[CONTEXT_ID_NUM];
 
-uint8_t busyflag = 1;
+uint8_t busyflag = 0;
 
 void dlt_register(void)
 {
-    for (uint8_t i = 0; i < MAX_MODULE_NUM; i++)
+    for (uint8_t i = 0; i < CONTEXT_ID_NUM; i++)
     {
         level_cfg[i] = LOG_LEVEL_DEFA;
     }
@@ -80,14 +78,14 @@ __attribute__((weak)) void display_EVENT_DLT(gdcn_core_handle_t gdcn_handle, uin
     {
         printf("%02X ", data[i]);
     }
-    printf("%s\n", &data[PRE_PAYLOAD_SIZE]);
+    printf("%s", &data[PRE_PAYLOAD_SIZE]);
 }
 
 bool logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len)
 {
 
     // dlt_log_t *target = log_group_search(context_id);
-    if (context_id >= MAX_MODULE_NUM)
+    if (context_id >= CONTEXT_ID_NUM)
     {
         return false;
     }
@@ -148,19 +146,12 @@ bool dlt_console(int argc, char *argv[])
     }
     else if (!STRNCMP(argv[1], "log"))
     {
-        uint8_t buf[] = "LOG_XXXX";
-        memcpy(buf, "LOG_FATA", sizeof(buf));
-        LOG_FATA(7, buf, sizeof(buf));
-        memcpy(buf, "LOG_ERRO", sizeof(buf));
-        LOG_ERRO(7, buf, sizeof(buf));
-        memcpy(buf, "LOG_WARN", sizeof(buf));
-        LOG_WARN(7, buf, sizeof(buf));
-        memcpy(buf, "LOG_INFO", sizeof(buf));
-        LOG_INFO(7, buf, sizeof(buf));
-        memcpy(buf, "LOG_DEBU", sizeof(buf));
-        LOG_DEBU(7, buf, sizeof(buf));
-        memcpy(buf, "LOG_VERB", sizeof(buf));
-        LOG_VERB(7, buf, sizeof(buf));
+        dlt_gdcn_f("dlt_gdcn_f:%d\n", 2);
+        dlt_gdcn_e("dlt_gdcn_e:0x%02X\n", 0x50);
+        dlt_gdcn_w("dlt_gdcn_w:%s\n","ssssss");
+        dlt_gdcn_i("dlt_gdcn_i\n");
+        dlt_gdcn_d("dlt_gdcn_d\n");
+        dlt_gdcn_v("dlt_gdcn_v\n");
     }
     else if (!STRNCMP(argv[1], "level"))
     {

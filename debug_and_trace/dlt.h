@@ -14,38 +14,50 @@
 
 typedef enum
 {
-    TEST = 0,
-    BTLD = 1,
-    OSYS = 2,
-    GDCN = 3,
-    LINK = 4,
-    WARP = 5,
-    FLSH = 6,
-    TOCH = 7,
-    DIBL = 8,
-    SAFE = 9,
-    PERI = 10,
-    MISC = 11,
-    MAX_MODULE_NUM,
+    CONTEXT_ID_TEST = 0,
+    CONTEXT_ID_BTLD = 1,
+    CONTEXT_ID_OSYS = 2,
+    CONTEXT_ID_GDCN = 3,
+    CONTEXT_ID_LINK = 4,
+    CONTEXT_ID_WARP = 5,
+    CONTEXT_ID_FLSH = 6,
+    CONTEXT_ID_TOCH = 7,
+    CONTEXT_ID_DIBL = 8,
+    CONTEXT_ID_SAFE = 9,
+    CONTEXT_ID_PERI = 10,
+    CONTEXT_ID_MISC = 11,
+    CONTEXT_ID_NUM,
 } CONTEXT_ID_E;
 
 // LOG LEVEL
-#define LOG_LEVEL_NONE 0x00
-#define LOG_LEVEL_FATA 0x01
-#define LOG_LEVEL_ERRO 0x02
-#define LOG_LEVEL_WARN 0x03
-#define LOG_LEVEL_INFO 0x04
-#define LOG_LEVEL_DEBU 0x05
-#define LOG_LEVEL_VERB 0x06
-#define LOG_LEVEL_DEFA LOG_LEVEL_WARN
+typedef enum
+{
+    LOG_LEVEL_NONE = 0,
+    LOG_LEVEL_FATA = 1,
+    LOG_LEVEL_ERRO = 2,
+    LOG_LEVEL_WARN = 3,
+    LOG_LEVEL_INFO = 4,
+    LOG_LEVEL_DEBU = 5,
+    LOG_LEVEL_VERB = 6,
+    LOG_LEVEL_DEFA = LOG_LEVEL_WARN,
+} LOG_LEVEL_E;
 
-#define LOG_FATA(context_id, data, len) logging(context_id, LOG_LEVEL_FATA, data, len)
-#define LOG_ERRO(context_id, data, len) logging(context_id, LOG_LEVEL_ERRO, data, len)
-#define LOG_WARN(context_id, data, len) logging(context_id, LOG_LEVEL_WARN, data, len)
-#define LOG_INFO(context_id, data, len) logging(context_id, LOG_LEVEL_INFO, data, len)
-#define LOG_DEBU(context_id, data, len) logging(context_id, LOG_LEVEL_DEBU, data, len)
-#define LOG_VERB(context_id, data, len) logging(context_id, LOG_LEVEL_VERB, data, len)
+#define PAYLOAD_SIZE (100)
+#define LOG_BUFFER_SIZE (10)
 
+#define dlt_gdcn_f(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_FATA, format, ##__VA_ARGS__)
+#define dlt_gdcn_e(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_ERRO, format, ##__VA_ARGS__)
+#define dlt_gdcn_w(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_WARN, format, ##__VA_ARGS__)
+#define dlt_gdcn_i(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_INFO, format, ##__VA_ARGS__)
+#define dlt_gdcn_d(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_DEBU, format, ##__VA_ARGS__)
+#define dlt_gdcn_v(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_VERB, format, ##__VA_ARGS__)
+#define LOG(ID, LEVEL, format, ...)                                         \
+    do                                                      \
+    {                                                       \
+        char buffer[PAYLOAD_SIZE];                          \
+        gbl_sprintf(buffer, format, ##__VA_ARGS__); \
+        logging(ID, LEVEL, (uint8_t *)buffer, strlen(buffer));         \
+    } while (0)
 
 void dlt_register(void);
 uint8_t dlt_level_set(uint32_t context_id, uint8_t level);

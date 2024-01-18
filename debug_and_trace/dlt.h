@@ -29,7 +29,6 @@ typedef enum
     CONTEXT_ID_NUM,
 } CONTEXT_ID_E;
 
-// LOG LEVEL
 typedef enum
 {
     LOG_LEVEL_NONE = 0,
@@ -45,22 +44,26 @@ typedef enum
 #define PAYLOAD_SIZE (100)
 #define LOG_BUFFER_SIZE (10)
 
-#define dlt_gdcn_f(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_FATA, format, ##__VA_ARGS__)
-#define dlt_gdcn_e(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_ERRO, format, ##__VA_ARGS__)
-#define dlt_gdcn_w(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_WARN, format, ##__VA_ARGS__)
-#define dlt_gdcn_i(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_INFO, format, ##__VA_ARGS__)
-#define dlt_gdcn_d(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_DEBU, format, ##__VA_ARGS__)
-#define dlt_gdcn_v(format, ...) LOG(CONTEXT_ID_GDCN, LOG_LEVEL_VERB, format, ##__VA_ARGS__)
-#define LOG(ID, LEVEL, format, ...)                                         \
-    do                                                      \
-    {                                                       \
-        char buffer[PAYLOAD_SIZE];                          \
-        gbl_sprintf(buffer, format, ##__VA_ARGS__); \
-        logging(ID, LEVEL, (uint8_t *)buffer, strlen(buffer));         \
+#define LOG(CONTEXT_ID, LEVEL, format, ...)                            \
+    do                                                                 \
+    {                                                                  \
+        char buffer[PAYLOAD_SIZE];                                     \
+        gbl_sprintf(buffer, format, ##__VA_ARGS__);                    \
+        dlt_logging(CONTEXT_ID, LEVEL, (uint8_t *)buffer, strlen(buffer)); \
     } while (0)
 
-void dlt_register(void);
+#define dlt_f(ctx, format, ...) LOG(CONTEXT_ID_##ctx, LOG_LEVEL_FATA, format, ##__VA_ARGS__)
+#define dlt_e(ctx, format, ...) LOG(CONTEXT_ID_##ctx, LOG_LEVEL_ERRO, format, ##__VA_ARGS__)
+#define dlt_w(ctx, format, ...) LOG(CONTEXT_ID_##ctx, LOG_LEVEL_WARN, format, ##__VA_ARGS__)
+#define dlt_i(ctx, format, ...) LOG(CONTEXT_ID_##ctx, LOG_LEVEL_INFO, format, ##__VA_ARGS__)
+#define dlt_d(ctx, format, ...) LOG(CONTEXT_ID_##ctx, LOG_LEVEL_DEBU, format, ##__VA_ARGS__)
+#define dlt_v(ctx, format, ...) LOG(CONTEXT_ID_##ctx, LOG_LEVEL_VERB, format, ##__VA_ARGS__)
+
+typedef bool (*cb_connect_check_t)(void);
+void dlt_log_level_init(void);
+void dlt_cb_connect_check_register(cb_connect_check_t cb);
 uint8_t dlt_level_set(uint32_t context_id, uint8_t level);
+bool dlt_logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len);
 uint8_t dlt_init(void);
 uint8_t dlt_loop(void);
 bool dlt_console(int argc, char *argv[]);

@@ -25,7 +25,19 @@ uint8_t level_cfg[CONTEXT_ID_NUM];
 
 uint8_t busyflag = 0;
 
-void dlt_register(void)
+cb_connect_check_t connect_check = NULL;
+
+void dlt_cb_connect_check_register(cb_connect_check_t cb)
+{
+    connect_check = cb;
+}
+
+__attribute__((weak)) bool connect(void)
+{
+    return busyflag;
+}
+
+void dlt_log_level_init(void)
 {
     for (uint8_t i = 0; i < CONTEXT_ID_NUM; i++)
     {
@@ -74,14 +86,14 @@ __attribute__((weak)) void display_EVENT_DLT(gdcn_core_handle_t gdcn_handle, uin
 {
     (void)gdcn_handle;
     // printf("message_id:%08X, data:%s, len:%d\n", message_id, data, len);
-    for (uint8_t i = 0; i < len; i++)
+    for (uint8_t i = 0; i < PRE_PAYLOAD_SIZE; i++)
     {
         printf("%02X ", data[i]);
     }
     printf("%s", &data[PRE_PAYLOAD_SIZE]);
 }
 
-bool logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len)
+bool dlt_logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len)
 {
 
     // dlt_log_t *target = log_group_search(context_id);
@@ -101,7 +113,13 @@ bool logging(uint8_t context_id, uint8_t level, uint8_t *data, uint16_t len)
         memset(log.payload, 0, PAYLOAD_SIZE);
         memcpy(log.payload, data, len);
 
-        if (busyflag == 0)
+        if(connect_check == NULL)
+        {
+            printf("connect_check callback is not registered\n ");
+            return false;
+        }
+
+        if (connect_check() == 0)
         {
             gdcn_core_handle_t gdcn_handle;
             display_EVENT_DLT(gdcn_handle, MESSAGE_ID, (uint8_t *)&log, log.len + PRE_PAYLOAD_SIZE);
@@ -118,12 +136,12 @@ uint8_t dlt_init(void)
 {
     if (gbl_rb_init(&log_rb, log_buffer, LOG_BUFFER_SIZE * sizeof(dlt_log_t), LOG_BUFFER_SIZE, sizeof(dlt_log_t)) != 0)
         printf("gbl_rb_init fail\n");
-    printf("dlt_init\n");
-    dlt_register();
+    dlt_cb_connect_check_register(connect);
+    dlt_log_level_init();
 }
 uint8_t dlt_loop(void)
 {
-    if (!gbl_rb_is_empty(&log_rb) && busyflag == 0)
+    if (!gbl_rb_is_empty(&log_rb) && connect_check() == 0)
     {
         dlt_log_t log;
         dlt_restore((uint8_t *)&log);
@@ -146,12 +164,12 @@ bool dlt_console(int argc, char *argv[])
     }
     else if (!STRNCMP(argv[1], "log"))
     {
-        dlt_gdcn_f("dlt_gdcn_f:%d\n", 2);
-        dlt_gdcn_e("dlt_gdcn_e:0x%02X\n", 0x50);
-        dlt_gdcn_w("dlt_gdcn_w:%s\n","ssssss");
-        dlt_gdcn_i("dlt_gdcn_i\n");
-        dlt_gdcn_d("dlt_gdcn_d\n");
-        dlt_gdcn_v("dlt_gdcn_v\n");
+        dlt_f(GDCN, "DLT_FATA, val_1:%d, val_2:%d\n", 5, 9);
+        dlt_e(GDCN, "DLT_ERRO, val_1:0x%02X\n", 0x50);
+        dlt_w(GDCN, "DLT_WARN, string:%s\n", "ssssss");
+        dlt_i(GDCN, "DLT_INFO\n");
+        dlt_d(GDCN, "DLT_DEBU\n");
+        dlt_v(GDCN, "DLT_VERB\n");
     }
     else if (!STRNCMP(argv[1], "level"))
     {

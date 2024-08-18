@@ -1,11 +1,11 @@
-#include "debug_trace.h"
+#include "dlt.h"
 #include "gbl_console.h"
 #include "gbl_string.h"
 #include "gbl_stdio.h"
 
 int main(void)
 {
-    debug_trace_init();
+    dlt_init();
     printf("main init\n");
     while (1)
     {			
@@ -17,8 +17,8 @@ int main(void)
             char *argv[16];
             argc = gbl_strseg(l, " ", argv, sizeof(argv) / sizeof(argv[0]));
 
-            debug_trace_console(argc, argv);
+            dlt_console(argc, argv);
         }
-        // debug_trace_loop();
+        dlt_loop();
     }
 }

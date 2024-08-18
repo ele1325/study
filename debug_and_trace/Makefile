@@ -17,8 +17,9 @@ endef
 
 # ------------------------------------------------------------------------------
 # 
+MAKEFLAGS += -j12
 
-target = dt
+target = dlt
 
 source_path = . 
 output_path = build

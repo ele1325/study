@@ -432,7 +432,7 @@ static char *console_process(char c)
          * Windows = 0x00 + arrow
         * ----------------------------------------------------------*/
 #ifdef __MINGW32__
-        else if (c == 0x00) // arrow keys
+        else if (c == 0x00 || c == (char)0xE0) // arrow keys
         {
             m_console.st = 2;
         }

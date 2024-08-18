@@ -12,43 +12,34 @@
 
 char *countAndSay(int n)
 {
-    uint8_t i = 0;
-    uint8_t j = 0;
-    uint8_t cnt = 0;
-    char *base = "1";
-    char *ret;
-    ret = malloc(10);
-
-    for (i = 1; i <= n; i++)
+    int j = 0, c = 1;
+    char *ans = malloc(5000 * sizeof(char));
+    char *temp = malloc(5000 * sizeof(char));
+    ans[0] = '1';
+    ans[1] = '\0';
+    for (int i = 1; i < n; i++)
     {
-        if (i == 1)
+        int k = 0;
+        while (ans[j] != '\0')
         {
-            memcpy(ret, base, strlen(base) + 1);
-        }
-        else
-        {
-            uint8_t len = strlen(ret);
-            for (j = 0; j < len; j++)
+            if (ans[j] == ans[j + 1])
             {
-                if(len == 1)
-                {
-                    cnt = 1;
-                }
-                else
-                {
-                    
-                }
-                printf("i:%d  j:%d\n", i, j);
-                printf("1:%s\n", ret);
-                printf("2:%d\n", strlen(ret));
-                snprintf(ret, 10, "%d%c", cnt, ret[j]);
-                printf("3:%s\n", ret);
-                printf("4:%d\n", strlen(ret));
-                printf("5:%s\n", ret);
+                c++;
             }
+            else
+            {
+                temp[k] = c + '0';
+                temp[k + 1] = ans[j];
+                k = k + 2;
+                c = 1;
+            }
+            j++;
         }
+        
+        temp[k] = '\0';
+        strcpy(ans, temp);
+        j = 0;
     }
-
-    return ret;
+    return (ans);
 }
 // @lc code=end

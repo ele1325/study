@@ -39,6 +39,6 @@
     "doxygen_runner.doxygen_command": "C:\\Program Files\\doxygen\\bin\\doxygen.exe",
     "doxygen_runner.configuration_file_override": "${workspaceFolder}\\Doxyfile",
     "files.associations": {
-
+        "time.h": "c"
     },
 }

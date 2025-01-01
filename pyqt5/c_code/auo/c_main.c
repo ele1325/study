@@ -2,8 +2,9 @@
 #include "extra.h"
 #include <stdio.h>
 #include <time.h>
+#include "c_main.h"
 
-int main()
+__attribute__((visibility("default"))) int c_main_api(void)
 {
     print_hello();
     print_extra();

@@ -1,6 +1,6 @@
 # Define the compiler and the flags
 CC = gcc
-CFLAGS = -Wall -Wextra -shared -fPIC
+CFLAGS = -Wall -Wextra
 DEPFLAGS = -MMD -MP
 
 # Default parallel jobs to 16 if not specified
@@ -29,7 +29,7 @@ OBJS := $(SRCS:%.c=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 # Define the output executable
-TARGET = c_main_api.dll
+TARGET = main
 
 # The default target, it depends on the executable
 all: $(TARGET)

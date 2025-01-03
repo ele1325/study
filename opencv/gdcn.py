@@ -50,7 +50,7 @@ def set_test_image_display(onoff, screen):
     payload = [int(byte) for byte in payload]
 
     try:
-        ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
     except Exception as e:
         print(e)
         sys.exit()
@@ -76,11 +76,11 @@ def sensor_ident_lesen():
         sys.exit()
 
 if __name__ == "__main__":
-    a = sensor_ident_lesen()
+    a = set_test_image_display(True, 3)
     print(a)
-    # get_display_id()
-    # time.sleep(1)
-    # set_test_image_display(True, 1)
+    get_display_id()
+    time.sleep(1)
+    set_test_image_display(True, 1)
     # time.sleep(1)
     # set_test_image_display(True, 2)
     # time.sleep(1)

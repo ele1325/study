@@ -60,18 +60,30 @@ def get_display_id():
     cmd_id = 0x20
     payload = None
     try:
-        print(ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload))
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+    except Exception as e:
+        print(e)
+        sys.exit()
+
+def sensor_ident_lesen():
+    channel = 64
+    cmd_id = 0x20
+    payload = None
+    try:
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
     except Exception as e:
         print(e)
         sys.exit()
 
 if __name__ == "__main__":
-    get_display_id()
-    time.sleep(1)
-    set_test_image_display(True, 1)
-    time.sleep(1)
-    set_test_image_display(True, 2)
-    time.sleep(1)
-    set_test_image_display(True, 3)
-    time.sleep(1)
-    set_test_image_display(True, 4)
+    a = sensor_ident_lesen()
+    print(a)
+    # get_display_id()
+    # time.sleep(1)
+    # set_test_image_display(True, 1)
+    # time.sleep(1)
+    # set_test_image_display(True, 2)
+    # time.sleep(1)
+    # set_test_image_display(True, 3)
+    # time.sleep(1)
+    # set_test_image_display(True, 4)

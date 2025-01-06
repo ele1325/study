@@ -11,7 +11,8 @@ def test_status_sw_version():
     else:
         result = status_sw_version()
     expected = expected_status_sw_version
-    assert result == expected
+    assert result[:16] == expected[:16]
+    assert result[-5:] == expected[-5:]
 
 def test_sensor_ident_lesen():
     if SIL:

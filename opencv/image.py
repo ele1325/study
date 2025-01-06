@@ -17,30 +17,26 @@ def take_photo(image_path):
     cv2.imwrite(image_path, frame)
     cap.release()  # Release the camera
 
-def deskew_image(image):
+def preprocess_image(image):
 
     # 灰階處理
-    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # 二值化處理
+    _, image = cv2.threshold(image, 200, 255, cv2.THRESH_BINARY_INV)
     # 邊緣檢測
     edges = cv2.Canny(image, 50, 150)
-
     # 輪廓檢測
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
     # 找到最大輪廓（假設最大輪廓是文字區域）
     largest_contour = max(contours, key=cv2.contourArea)
-
     # 計算最小外接矩形
     rect = cv2.minAreaRect(largest_contour)
     box = cv2.boxPoints(rect)
     box = np.int8(box)
-
     # 計算旋轉角度
     angle = rect[-1]
     if angle < -45:
         angle = angle + 90
-
     # 旋轉影像校正
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
@@ -52,35 +48,18 @@ def deskew_image(image):
 def is_bmw_text(image_path):
     """Use OCR to determine if the photo contains the text 'BMW'"""
     img = cv2.imread(image_path)
-    cv2.imshow('Binary Image', img)
+    cv2.imshow('Image', img)
     # cv2.imwrite(image_path, img)
-    cv2.waitKey(0)  # Wait for a key event
-    cv2.destroyAllWindows()  # Close the display window
+    cv2.waitKey(800)  # Wait for a key event
 
-    # # Correct the skew of the image
-    # img = deskew_image(img)
-
-    # Preprocess the image
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
-    # binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    # inverted_binary = cv2.bitwise_not(binary)
-
-    # Display the preprocessed image
-    cv2.imshow('Binary Image', binary)
-    # cv2.imwrite(image_path, inverted_binary)
-    cv2.waitKey(0)  # Wait for a key event
-    cv2.destroyAllWindows()  # Close the display window
-
-    binary = deskew_image(binary)
+    img = preprocess_image(img)
         # Display the preprocessed image
-    cv2.imshow('Binary Image', binary)
-    cv2.imwrite('bmw_result.jpg', binary)
-    cv2.waitKey(0)  # Wait for a key event
-    cv2.destroyAllWindows()  # Close the display window
+    cv2.imshow('Image', img)
+    cv2.imwrite('bmw_result.jpg', img)
+    cv2.waitKey(800)  # Wait for a key event
 
     # Use OCR
-    text = pytesseract.image_to_string(binary, config='--psm 7')
+    text = pytesseract.image_to_string(img, config='--psm 7')
     print(text)
     return "BMW" in text
 

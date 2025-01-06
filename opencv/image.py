@@ -18,31 +18,51 @@ def take_photo(image_path):
     cap.release()  # Release the camera
 
 def deskew_image(image):
-    """Correct the skew of the text in the image"""
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    coords = np.column_stack(np.where(gray > 0))
-    angle = cv2.minAreaRect(coords)[-1]
-    if angle < -45:
-        angle = -(90 + angle)
-    else:
-        angle = -angle
 
-    (h, w) = image.shape[:2]
+    # 灰階處理
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # 邊緣檢測
+    edges = cv2.Canny(gray, 50, 150)
+
+    # 輪廓檢測
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # 找到最大輪廓（假設最大輪廓是文字區域）
+    largest_contour = max(contours, key=cv2.contourArea)
+
+    # 計算最小外接矩形
+    rect = cv2.minAreaRect(largest_contour)
+    box = cv2.boxPoints(rect)
+    box = np.int8(box)
+
+    # 計算旋轉角度
+    angle = rect[-1]
+    if angle < -45:
+        angle = angle + 90
+
+    # 旋轉影像校正
+    (h, w) = gray.shape[:2]
     center = (w // 2, h // 2)
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv2.warpAffine(gray, rotation_matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
     return rotated
 
 def is_bmw_text(image_path):
     """Use OCR to determine if the photo contains the text 'BMW'"""
     img = cv2.imread(image_path)
+    cv2.imshow('Binary Image', img)
+    cv2.imwrite(image_path, img)
+    cv2.waitKey(0)  # Wait for a key event
+    cv2.destroyAllWindows()  # Close the display window
 
     # Correct the skew of the image
     img = deskew_image(img)
 
     # Preprocess the image
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     inverted_binary = cv2.bitwise_not(binary)
 
     # Display the preprocessed image
@@ -113,8 +133,8 @@ if __name__ == "__main__":
     # else:
     #     print("The photo does not contain the text 'BMW'")
 
-    color = 'red'  # Can be changed to 'red', 'green', 'white', 'black'
-    if is_center_color(photo_path, color):
-        print(f"The center region of the photo is {color}")
-    else:
-        print(f"The center region of the photo is not {color}")
+    # color = 'red'  # Can be changed to 'red', 'green', 'white', 'black'
+    # if is_center_color(photo_path, color):
+    #     print(f"The center region of the photo is {color}")
+    # else:
+    #     print(f"The center region of the photo is not {color}")

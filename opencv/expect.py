@@ -1,5 +1,4 @@
 # Configurations for the expect script -- start
-SIL = True
 ISTEP_Index = 4
 HWEL = "182.002.002"
 BTLD = "182.002.010"

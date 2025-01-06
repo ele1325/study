@@ -39,25 +39,9 @@ def set_target_luminance():
         print(e)
         sys.exit()
 
-def set_test_image_display(onoff, screen):
+def status_sw_version():
     channel = 64
-    cmd_id = 51
-
-    ON_OFF = struct.pack('>?', onoff)
-    SCREEN = struct.pack('>H', screen)
-
-    payload = ON_OFF + SCREEN
-    payload = [int(byte) for byte in payload]
-
-    try:
-        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
-    except Exception as e:
-        print(e)
-        sys.exit()
-
-def get_display_id():
-    channel = 16
-    cmd_id = 0x20
+    cmd_id = 0x63
     payload = None
     try:
         return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
@@ -75,10 +59,68 @@ def sensor_ident_lesen():
         print(e)
         sys.exit()
 
+def get_display_svk():
+    channel = 64
+    cmd_id = 0x37
+    payload = None
+    try:
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+    except Exception as e:
+        print(e)
+        sys.exit()
+
+def get_display_id_short():
+    channel = 16
+    cmd_id = 0x21
+    payload = None
+    try:
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+    except Exception as e:
+        print(e)
+        sys.exit()
+
+def get_display_id():
+    channel = 16
+    cmd_id = 0x20
+    payload = None
+    try:
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+    except Exception as e:
+        print(e)
+        sys.exit()
+
+def get_dsc_capabilities():
+    channel = 16
+    cmd_id = 0x24
+    payload = None
+    try:
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+    except Exception as e:
+        print(e)
+        sys.exit()
+
+def set_test_image_display(onoff, screen):
+    channel = 64
+    cmd_id = 51
+
+    ON_OFF = struct.pack('>?', onoff)
+    SCREEN = struct.pack('>H', screen)
+
+    payload = ON_OFF + SCREEN
+    payload = [int(byte) for byte in payload]
+
+    try:
+        return ged4k_tx.gdcn_send(Display(3, 0, 0), channel, cmd_id, payload)
+    except Exception as e:
+        print(e)
+        sys.exit()
+
 if __name__ == "__main__":
     a = set_test_image_display(True, 3)
     print(a)
-    get_display_id()
+    b = status_sw_version()
+    print(b)
+
     # time.sleep(1)
     # set_test_image_display(True, 1)
     # time.sleep(1)

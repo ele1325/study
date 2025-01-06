@@ -1,5 +1,5 @@
 # Configurations for the expect script -- start
-SIL = True
+SIL = False
 ISTEP_Index = 4
 HWEL = "182.002.002"
 BTLD = "182.002.010"
@@ -12,6 +12,9 @@ CMDSEQ = 24122501
 
 SW = ISTEP_Index * 100 + int(SWFL.split('.')[-1])
 HW = ISTEP_Index * 100 + int(HWEL.split('.')[-1])
+
+expected_status_sw_version = [182, 81, 0, 10, 36, 18, 37, 1, 0, 0, 6, 2, 0, 10, 14, 0, 0, 0, 0, 1, 0, 0, 0, 1, 182, 81,
+                               0, 10, 182, 81, 0, 10, 36, 18, 37, 1, 36, 18, 37, 1, 0, 0, 15, 201, 0] 
 
 expected_sensor_ident_lesen = [91, 64, 0, 255, 5, 181, 20, 70, 255, 255, 255, 255, 255, None, None, None, None, None, None, None] \
                      + list(SW.to_bytes(2, byteorder='big')) \
@@ -28,6 +31,8 @@ expected_display_id = [
     154, 78, 196, 52, 169, 102, 98, 16, 233, 36, 82, 176, 100, 0, 0, 0, 0, 2, 120, 34, 0, 20, 102, 49, 4, 128, 59, 12, 
     143, 0, 35, 0, 11, 0, 69, 5, 47, 0, 41, 0, 2, 0, 38, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 35
 ]
+
+expected_dsc_capabilities = [1, 33, 1, 9, 1, 1, 0, 3, 6, 0, 24, 0, 0]
 
 if __name__ == "__main__":
     print(SW)

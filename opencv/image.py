@@ -20,10 +20,10 @@ def take_photo(image_path):
 def deskew_image(image):
 
     # 灰階處理
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # 邊緣檢測
-    edges = cv2.Canny(gray, 50, 150)
+    edges = cv2.Canny(image, 50, 150)
 
     # 輪廓檢測
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -42,10 +42,10 @@ def deskew_image(image):
         angle = angle + 90
 
     # 旋轉影像校正
-    (h, w) = gray.shape[:2]
+    (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
     rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated = cv2.warpAffine(gray, rotation_matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    rotated = cv2.warpAffine(image, rotation_matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
     return rotated
 
@@ -53,26 +53,34 @@ def is_bmw_text(image_path):
     """Use OCR to determine if the photo contains the text 'BMW'"""
     img = cv2.imread(image_path)
     cv2.imshow('Binary Image', img)
-    cv2.imwrite(image_path, img)
+    # cv2.imwrite(image_path, img)
     cv2.waitKey(0)  # Wait for a key event
     cv2.destroyAllWindows()  # Close the display window
 
-    # Correct the skew of the image
-    img = deskew_image(img)
+    # # Correct the skew of the image
+    # img = deskew_image(img)
 
     # Preprocess the image
-    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    inverted_binary = cv2.bitwise_not(binary)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+    # binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    # inverted_binary = cv2.bitwise_not(binary)
 
     # Display the preprocessed image
-    cv2.imshow('Binary Image', inverted_binary)
-    cv2.imwrite(image_path, inverted_binary)
+    cv2.imshow('Binary Image', binary)
+    # cv2.imwrite(image_path, inverted_binary)
+    cv2.waitKey(0)  # Wait for a key event
+    cv2.destroyAllWindows()  # Close the display window
+
+    binary = deskew_image(binary)
+        # Display the preprocessed image
+    cv2.imshow('Binary Image', binary)
+    cv2.imwrite('bmw_result.jpg', binary)
     cv2.waitKey(0)  # Wait for a key event
     cv2.destroyAllWindows()  # Close the display window
 
     # Use OCR
-    text = pytesseract.image_to_string(inverted_binary, lang='eng')
+    text = pytesseract.image_to_string(binary, config='--psm 7')
     print(text)
     return "BMW" in text
 
@@ -127,11 +135,11 @@ def is_center_color(image_path, color):
 
 if __name__ == "__main__":
     photo_path = "photo.jpg"
-    take_photo(photo_path)
-    # if is_bmw_text(photo_path):
-    #     print("The photo contains the text 'BMW'")
-    # else:
-    #     print("The photo does not contain the text 'BMW'")
+    # take_photo(photo_path)
+    if is_bmw_text(photo_path):
+        print("The photo contains the text 'BMW'")
+    else:
+        print("The photo does not contain the text 'BMW'")
 
     # color = 'red'  # Can be changed to 'red', 'green', 'white', 'black'
     # if is_center_color(photo_path, color):

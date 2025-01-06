@@ -19,20 +19,33 @@
     // -------------------------------------------------------------------------
     //  MSYS2
     //
-    "terminal.integrated.defaultProfile.windows": "MSYS2",
-    "terminal.integrated.profiles.windows": {
-        "MSYS2": {
-            "path": "C:\\msys64\\usr\\bin\\bash.exe",
-            "args": [
-                "--login",
-                "-i"
-            ],
-            "env": {
-                "MSYSTEM": "MINGW32",
-                "CHERE_INVOKING": "1"
+    // "terminal.integrated.defaultProfile.windows": "MSYS2",
+    // "terminal.integrated.profiles.windows": {
+    //     "MSYS2": {
+    //         "path": "C:\\msys64\\usr\\bin\\bash.exe",
+    //         "args": [
+    //             "--login",
+    //             "-i"
+    //         ],
+    //         "env": {
+    //             "MSYSTEM": "MINGW32",
+    //             "CHERE_INVOKING": "1"
+    //         }
+    //     }
+    // },
+    // -------------------------------------------------------------------------
+    //  Git bash
+        "terminal.integrated.defaultProfile.windows": "Git Bash",
+        "terminal.integrated.profiles.windows": {
+            "Git Bash": {
+                "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+                "args": [
+                    "--login",
+                    "-i"
+                ]
             }
         }
-    },
+    }
     // -------------------------------------------------------------------------
     //  Doxygen
     //

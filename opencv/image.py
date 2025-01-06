@@ -8,7 +8,7 @@ def take_photo(image_path):
     if not cap.isOpened():
         raise RuntimeError("Cannot open the camera")
     
-    time.sleep(1)  # Wait for the camera to warm up    
+    # time.sleep(1)  # Wait for the camera to warm up    
     ret, frame = cap.read() # Read a frame
     if not ret:
         raise RuntimeError("Cannot read the frame")
@@ -23,6 +23,9 @@ def preprocess_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # 二值化處理
     _, image = cv2.threshold(image, 200, 255, cv2.THRESH_BINARY_INV)
+    # 膨胀操作（增强文字区域）
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    image = cv2.dilate(image, kernel, iterations=1)
     # 邊緣檢測
     edges = cv2.Canny(image, 50, 150)
     # 輪廓檢測
@@ -49,7 +52,7 @@ def is_bmw_text(image_path):
     """Use OCR to determine if the photo contains the text 'BMW'"""
     img = cv2.imread(image_path)
     cv2.imshow('Image', img)
-    # cv2.imwrite(image_path, img)
+    cv2.imwrite(image_path, img)
     cv2.waitKey(800)  # Wait for a key event
 
     img = preprocess_image(img)
@@ -107,14 +110,14 @@ def is_center_color(image_path, color):
     print(color_ratio)
     # Display the center region
     cv2.imshow('Center Region', center_region)
-    cv2.waitKey(1000)
-    cv2.destroyAllWindows()
+    cv2.waitKey(800)
+    # cv2.destroyAllWindows()
 
     return color_ratio > 0.5  # If the ratio of the specified color pixels is more than 50%, consider it as that color
 
 if __name__ == "__main__":
     photo_path = "photo.jpg"
-    # take_photo(photo_path)
+    take_photo(photo_path)
     if is_bmw_text(photo_path):
         print("The photo contains the text 'BMW'")
     else:

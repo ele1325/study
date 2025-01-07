@@ -25,7 +25,7 @@ def show_camera(cam):
         cv2.imshow('Camera', frame)  # Display the frame
         cv2.moveWindow('Camera', 100, 100)  # Move the window
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to exit
+        if cv2.waitKey(1) != -1:  # Press any key to exit
             break
 
     cam.release()  # Release the camera
@@ -57,7 +57,6 @@ def preprocess_image(image):
     edges = cv2.Canny(image, 50, 150)
     # 輪廓檢測
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    print("2222222222222222",contours)
     # 找到最大輪廓（假設最大輪廓是文字區域）
     largest_contour = max(contours, key=cv2.contourArea)
     # 計算最小外接矩形
@@ -87,7 +86,7 @@ def is_bmw_text(image_path):
     img = preprocess_image(img)
         # Display the preprocessed image
     cv2.imshow('Image', img)
-    cv2.imwrite('bmw_result.jpg', img)
+    cv2.imwrite('./photo/bmw_result.jpg', img)
     cv2.waitKey(800)  # Wait for a key event
 
     # Use OCR
@@ -150,7 +149,7 @@ if __name__ == "__main__":
 
     camera_thread = threading.Thread(target=show_camera, args=(cam,))
     camera_thread.start()
-    photo_path = "photo.jpg"
+    photo_path = "./photo/photo.jpg"
     take_photo(cam, photo_path)
     if is_bmw_text(photo_path):
         print("The photo contains the text 'BMW'")

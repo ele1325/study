@@ -5,7 +5,7 @@ import struct
 import sys
 import time
 
-SIL = True
+SIL = False
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
@@ -147,11 +147,11 @@ if __name__ == "__main__":
     b = status_sw_version()
     print(b)
 
-    # time.sleep(1)
-    # set_test_image_display(True, 1)
-    # time.sleep(1)
-    # set_test_image_display(True, 2)
-    # time.sleep(1)
-    # set_test_image_display(True, 3)
-    # time.sleep(1)
+    time.sleep(1)
+    set_test_image_display(True, 1)
+    time.sleep(1)
+    set_test_image_display(True, 2)
+    time.sleep(1)
+    set_test_image_display(True, 3)
+    time.sleep(1)
     set_test_image_display(True, 4)

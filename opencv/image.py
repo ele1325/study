@@ -2,27 +2,54 @@ import cv2
 import pytesseract
 import numpy as np
 import time
+import threading
 
-def take_photo(image_path):
-    cap = cv2.VideoCapture(1)  # Open the camera
-    if not cap.isOpened():
+def open_camera():
+    cam = cv2.VideoCapture(1)  # Open the camera
+    if not cam.isOpened():
         raise RuntimeError("Cannot open the camera")
-    
-    # time.sleep(1)  # Wait for the camera to warm up    
-    ret, frame = cap.read() # Read a frame
+    # 固定曝光和增益（如果支持）
+    cam.set(cv2.CAP_PROP_EXPOSURE, -8)  # 曝光值（視攝影機而定，通常負數表示手動模式）
+    cam.set(cv2.CAP_PROP_GAIN, 0)       # 增益值
+
+    return cam
+
+def show_camera(cam):
+
+    while True:
+        ret, frame = cam.read()  # Read a frame
+        if not ret:
+            print("Failed to grab frame")
+            break
+
+        cv2.imshow('Camera', frame)  # Display the frame
+        cv2.moveWindow('Camera', 100, 100)  # Move the window
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to exit
+            break
+
+    cam.release()  # Release the camera
+    # cv2.destroyAllWindows()  # Close the display window
+
+def release_camera(cam):
+    cam.release()  # Release the camera
+
+def take_photo(cam, image_path):
+    if not cam.isOpened():
+        raise RuntimeError("Camera is not opened")
+    time.sleep(1)  # Wait for the camera to warm up    
+    ret, frame = cam.read() # Read a frame
     if not ret:
         raise RuntimeError("Cannot read the frame")
-
     # Save the image
     cv2.imwrite(image_path, frame)
-    cap.release()  # Release the camera
 
 def preprocess_image(image):
 
     # 灰階處理
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # 二值化處理
-    _, image = cv2.threshold(image, 200, 255, cv2.THRESH_BINARY_INV)
+    _, image = cv2.threshold(image, 100, 255, cv2.THRESH_BINARY_INV)
     # 膨胀操作（增强文字区域）
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     image = cv2.dilate(image, kernel, iterations=1)
@@ -30,6 +57,7 @@ def preprocess_image(image):
     edges = cv2.Canny(image, 50, 150)
     # 輪廓檢測
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    print("2222222222222222",contours)
     # 找到最大輪廓（假設最大輪廓是文字區域）
     largest_contour = max(contours, key=cv2.contourArea)
     # 計算最小外接矩形
@@ -52,6 +80,7 @@ def is_bmw_text(image_path):
     """Use OCR to determine if the photo contains the text 'BMW'"""
     img = cv2.imread(image_path)
     cv2.imshow('Image', img)
+    cv2.moveWindow('Image', 800, 100)
     cv2.imwrite(image_path, img)
     cv2.waitKey(800)  # Wait for a key event
 
@@ -109,22 +138,27 @@ def is_center_color(image_path, color):
     color_ratio = cv2.countNonZero(mask) / (center_region.size / 3)
     print(color_ratio)
     # Display the center region
-    cv2.imshow('Center Region', center_region)
+    cv2.imshow('Image', center_region)
+    cv2.moveWindow('Image', 800, 100)
     cv2.waitKey(800)
     # cv2.destroyAllWindows()
 
     return color_ratio > 0.5  # If the ratio of the specified color pixels is more than 50%, consider it as that color
 
 if __name__ == "__main__":
+    cam = open_camera()
+
+    camera_thread = threading.Thread(target=show_camera, args=(cam,))
+    camera_thread.start()
     photo_path = "photo.jpg"
-    take_photo(photo_path)
+    take_photo(cam, photo_path)
     if is_bmw_text(photo_path):
         print("The photo contains the text 'BMW'")
     else:
         print("The photo does not contain the text 'BMW'")
 
-    # color = 'red'  # Can be changed to 'red', 'green', 'white', 'black'
-    # if is_center_color(photo_path, color):
-    #     print(f"The center region of the photo is {color}")
-    # else:
-    #     print(f"The center region of the photo is not {color}")
+    color = 'red'  # Can be changed to 'red', 'green', 'white', 'black'
+    if is_center_color(photo_path, color):
+        print(f"The center region of the photo is {color}")
+    else:
+        print(f"The center region of the photo is not {color}")

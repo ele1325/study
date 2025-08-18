@@ -1,0 +1,59 @@
+{
+    // -------------------------------------------------------------------------
+    // Editor
+    //
+    // The number of spaces a tab is equal to.
+    "editor.tabSize": 4,
+    // Insert spaces when pressing Tab.
+    "editor.insertSpaces": true,
+    // When opening a file, `editor.tabSize` and `editor.insertSpaces` 
+    // will be detected based on the file contents.
+    "editor.detectIndentation": false,
+    "editor.rulers": [
+        80
+    ],
+    "workbench.colorCustomizations": {
+        "editorRuler.foreground": "#cccccc"
+    },
+    //  "workbench.colorTheme": "Quiet Light",
+    // -------------------------------------------------------------------------
+    //  MSYS2
+    //
+    "terminal.integrated.defaultProfile.windows": "MSYS2",
+    "terminal.integrated.profiles.windows": {
+        "MSYS2": {
+            "path": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": [
+                "--login",
+                "-i"
+            ],
+            "env": {
+                "MSYSTEM": "MINGW32",
+                "CHERE_INVOKING": "1"
+            }
+        }
+    },
+    // -------------------------------------------------------------------------
+    //  Doxygen
+    //
+    "doxygen_runner.doxygen_command": "C:\\Program Files\\doxygen\\bin\\doxygen.exe",
+    "doxygen_runner.configuration_file_override": "${workspaceFolder}\\Doxyfile",
+
+    // -------------------------------------------------------------------------
+    //  Markdown
+    //
+    "markdown-preview-enhanced.plantumlJarPath": "${workspaceFolder}\\plantuml.jar",
+
+    // -------------------------------------------------------------------------
+    //  Auto
+    //
+    "files.associations": {
+        "storage.h": "c",
+        "rxb_manufacture.h": "c",
+        "gbl.h": "c",
+        "update.h": "c",
+        "gbl_stdio.h": "c",
+        "utils.h": "c",
+        "auo.h": "c"
+    },
+}

@@ -10,21 +10,22 @@ void print_hello()
     printf("Hello, World!:%d\n", num);
 }
 
-void command_parser(void *data, uint16_t len)
+void command_parser(int32_t client_fp, void *data, int32_t len)
 {
-    // Example command parser function
-    if (data == NULL || len == 0) {
-        printf("Invalid data or length\n");
-        return;
-    }
-    else
-    {
-        printf("Command parser called with data length: %d\n", len);
-    }
+    printf("Command parser called with client %d, data length %d\n", client_fp, len);
+    uint8_t a[5] = "aacc"; // Example modification
+    socket_server_write(client_fp, a, len-1);
 }
 
 void auo_init()
 {
     printf("auo_init\n");
+    socket_server_init();
     socket_server_cb_read_register(command_parser);
+}
+
+void auo_loop()
+{
+    // printf("auo_loop\n");
+    socket_server_loop();
 }

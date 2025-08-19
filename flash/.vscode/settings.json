@@ -29,7 +29,8 @@
             ],
             "env": {
                 "MSYSTEM": "MINGW32",
-                "CHERE_INVOKING": "1"
+                "CHERE_INVOKING": "1",
+                "PATH": "C:/msys64/mingw32/bin;${env:PATH}"
             }
         }
     },
@@ -54,6 +55,7 @@
         "update.h": "c",
         "gbl_stdio.h": "c",
         "utils.h": "c",
-        "auo.h": "c"
+        "auo.h": "c",
+        "stdint.h": "c"
     },
 }

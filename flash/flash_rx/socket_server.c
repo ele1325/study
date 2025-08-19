@@ -198,6 +198,7 @@ void socket_server_read(int client_fp)
     int r;
     char buff[4095];
     r = recv(client_fp, buff, sizeof(buff), 0);
+    printf("recv %d bytes from client %d\n", r, client_fp);
     if (r <= 0)
     {
         if (r == 0)

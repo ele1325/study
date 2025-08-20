@@ -1,0 +1,15 @@
+*.d
+*.o
+*.bak
+*.exe
+.DS_Store
+.dist
+__pycache__
+
+bin/
+log/
+package/build
+package/release
+
+
+

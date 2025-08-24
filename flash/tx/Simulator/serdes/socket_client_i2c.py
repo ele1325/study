@@ -2,7 +2,7 @@ import socket
 import time
 import threading
 
-class SocketClient:
+class SocketClientI2C:
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -63,6 +63,17 @@ class SocketClient:
             self.connect()
             # 重新發送消息
             self.send_message(message)
+
+    def write(self, addr, data):
+        # 將 addr 和 data 組成一個封包發送
+        packet = bytes([addr]) + data
+        self.client_socket.sendall(packet)
+
+    def read(self, addr, data, size):
+        # 發送讀取請求
+        packet = bytes([addr]) + data
+        self.client_socket.sendall(packet)
+        return self.client_socket.recv(size)
     
     def close(self):
         # 關閉客戶端連接
@@ -87,7 +98,7 @@ class SocketClient:
         self.close()
 
 if __name__ == "__main__":
-    # 創建 SocketClient 物件
-    client = SocketClient('localhost', 27015)
-    # 執行 SocketClient
+    # 創建 SocketClientI2C 物件
+    client = SocketClientI2C('localhost', 27015)
+    # 執行 SocketClientI2C
     client.run()

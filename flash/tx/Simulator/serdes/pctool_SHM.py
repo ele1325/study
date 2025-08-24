@@ -2,12 +2,14 @@ import sys
 import os
 import time
 import random
+from serdes.socket_client_i2c import *
 import ft4222
 import io
 import ft4222.I2CMaster
 from ft4222.I2CMaster import Flag as I2C_Flag
 from ft4222.GPIO import Dir, Port, Output,Trigger
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
+
 
 # I2C FLAG Include:
 '''
@@ -136,17 +138,23 @@ class AUO_Ft4222(QObject):
 
     def auo_opendevice(self):
         try:
-            self.dev = ft4222.openByDescription(self.devid)
-        except ft4222.FT2XXDeviceError as e:
-            print(e)
+            self.dev = SocketClientI2C("localhost", 27015)  # 這裡改成你的 socket client 類別
+            print("Socket client I2C connected.")
+        except Exception as e:
+            print("Socket client I2C connect error:", e)
+        # try:
+        #     self.dev = ft4222.openByDescription(self.devid)
+        # except ft4222.FT2XXDeviceError as e:
+        #     print(e)
 
     def auo_i2cMaster_Init(self, I2C_speed):
-        if self.DeviceCheck():
-            self.dev.i2cMaster_Init(I2C_speed)
-            self.dev.setTimeouts(2000, 2000)
-        else:
-            print("master init error")
-            return False
+        return True
+        # if self.DeviceCheck():
+        #     self.dev.i2cMaster_Init(I2C_speed)
+        #     self.dev.setTimeouts(2000, 2000)
+        # else:
+        #     print("master init error")
+        #     return False
     
     def write(self, data, size):
         if self.DeviceCheck():
@@ -154,15 +162,17 @@ class AUO_Ft4222(QObject):
             buf=data[2:]
             # self.updatelog("serdes write(0x%x): %s" % (addr, ' '.join('0x{:02X}'.format(x) for x in data)))
             try: 
-                self.dev.i2cMaster_WriteEx(addr,I2C_Flag.START_AND_STOP, buf)
-            except: 
+                # self.dev.i2cMaster_WriteEx(addr,I2C_Flag.START_AND_STOP, buf)
+                self.dev.write(addr, buf)
+            except:                 
                 self.updatelog("Ft4222 I2C Write Error!!")
         
     def read(self, addr, buff, size):
         try:
             if self.DeviceCheck():
-                ret = self.dev.i2cMaster_WriteEx(addr, I2C_Flag.START, buff)
-                return self.dev.i2cMaster_ReadEx(addr, I2C_Flag.REPEATED_START | I2C_Flag.STOP, size)
+                # ret = self.dev.i2cMaster_WriteEx(addr, I2C_Flag.START, buff)
+                # return self.dev.i2cMaster_ReadEx(addr, I2C_Flag.REPEATED_START | I2C_Flag.STOP, size)
+                return self.dev.read(addr, buff, size)
             else:
                 return b'\0x00'
         except: 
@@ -172,32 +182,35 @@ class AUO_Ft4222(QObject):
     def auo_i2cMaster_Write(self, int_slave_address, flag ,send_data):
         try: 
             if self.DeviceCheck():
-                self.dev.i2cMaster_WriteEx(int_slave_address,flag, send_data)
+                # self.dev.i2cMaster_WriteEx(int_slave_address,flag, send_data)
+                print("asdfasdfasdfsd")
+                self.dev.write(int_slave_address, send_data)
         except: 
             self.updatelog("Ft4222 I2C Write Error!!")
             
 
-    def auo_i2cMaster_Read(self, int_slave_address, flag, bytes_to_read):
-        try: 
-            if self.DeviceCheck():
-                self.data = self.dev.i2cMaster_ReadEx(int_slave_address, flag, bytes_to_read)  
-                return self.data #self.dev.i2cMaster_ReadEx(int_slave_address, flag, bytes_to_read)
-            else:
-                return b'\0x00'
-        except: 
-            self.updatelog("Ft4222 I2C Write Error!!")
-            return b'\0x00'   
+    # def auo_i2cMaster_Read(self, int_slave_address, flag, bytes_to_read):
+    #     try: 
+    #         if self.DeviceCheck():
+    #             self.data = self.dev.i2cMaster_ReadEx(int_slave_address, flag, bytes_to_read)  
+    #             return self.data #self.dev.i2cMaster_ReadEx(int_slave_address, flag, bytes_to_read)
+    #         else:
+    #             return b'\0x00'
+    #     except: 
+    #         self.updatelog("Ft4222 I2C Write Error!!")
+    #         return b'\0x00'   
 
     def auo_i2cMaster_Reset(self):
         if (self.dev == 0): 
             print("no device now")
             return False
         else:
-            self.dev.i2cMaster_Reset()
+            # self.dev.i2cMaster_Reset()
             return True
         # print('Reset done')
         
     def auo_gpio_Init(self):
+        return True
         if self.DeviceCheck():
             # use GPIO2 as gpio (not suspend out)
             self.dev.setSuspendOut(False)
@@ -210,6 +223,7 @@ class AUO_Ft4222(QObject):
             return False
     
     def auo_wakeup_gpio_set(self, switch):
+        return True
         try:
             if self.DeviceCheck():
                 if (switch == True):
@@ -221,6 +235,7 @@ class AUO_Ft4222(QObject):
             return 0
     
     def auo_wakeup_gpio_get(self):
+        return True
         try:
             if self.DeviceCheck():
                 return self.dev.gpio_Read(Port.P2)
@@ -231,6 +246,7 @@ class AUO_Ft4222(QObject):
             return 0
         
     def auo_INT_gpio_get(self):
+        return True
         try:
             if self.DeviceCheck(): 
                 return self.dev.gpio_Read(Port.P3)

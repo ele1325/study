@@ -919,7 +919,6 @@ class MainWindow(QtWidgets.QMainWindow):
             ## check GMSL link status
             ## 0x00: GMSL link status, 0x13: GMSL link status
             result = self.ft422_i2c.read(0x40, cmd, 1)
-            print("@@@@@", result)
             if (len(result) != 1):
                 self.gmsllink_thread_flag = False
                 self.gmsllinkMessage.emit("FT4222 GMSLlink Error")

@@ -13,7 +13,7 @@ void print_hello()
 void command_parser(int32_t client_fp, void *data, int32_t len)
 {
     printf("Command parser called with client %d, data length %d\n", client_fp, len);
-    uint8_t ack = 0x1; // Example modification
+    uint8_t ack = 0x08; // Example modification
     socket_server_write(client_fp, &ack, 1);
 }
 

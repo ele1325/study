@@ -1,1 +1,5 @@
-requests bs4 FinMind yfinance finlab openpyxl
+requests bs4 FinMind yfinance finlab openpyxl mplfinance
+
+Talib
+https://github.com/cgohlke/talib-build/releases
+pip install ta_lib-0.6.7-cp313-cp313-win_amd64.whl

@@ -6,7 +6,7 @@ import mplfinance as mpf
 
 # 取得回測資料
 prod = '0050'
-data = getFMPriceAndMarginTrade(prod, '2019-01-01', '2022-05-01')
+data = getFMPriceAndMarginTrade(prod, '2019-01-01', '2025-10-14')
 
 # 融資融券餘額
 data['融券今日餘額'] = data['ShortSaleTodayBalance'].astype(int)

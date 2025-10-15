@@ -6,7 +6,7 @@ import mplfinance as mpf
 
 # 取得回測資料
 prod = '2330'
-data = getFMPriceAndRevenue(prod, '2010-01-01', '2022-05-01')
+data = getFMPriceAndRevenue(prod, '2010-01-01', '2025-10-14')
 data['revenue_shift'] = data['revenue'].shift(12)
 data['前期比較增減(%)'] = ((data['revenue'] / data['revenue_shift'])-1)*100
 

@@ -6,7 +6,7 @@ import mplfinance as mpf
 
 # 取得回測資料
 prod='0050'
-data=getPriceAndInstInvest_FM(prod,'2019-05-01','2022-05-01')
+data=getPriceAndInstInvest_FM(prod,'2019-05-01','2025-10-14')
 
 # 計算 外資平均買賣
 data['F_day']=data['外陸資買進股數(不含外資自營商)']-data['外陸資賣出股數(不含外資自營商)']

@@ -7,7 +7,7 @@ from talib.abstract import SMA, WMA, EMA
 
 # 取得回測資料
 prod = '0050'
-data = getData(prod, '2014-01-01', '2022-05-01')
+data = getData(prod, '2014-01-01', '2025-10-14')
 
 # 計算指數移動平均線
 data["ema"] = EMA(data, timeperiod=120)

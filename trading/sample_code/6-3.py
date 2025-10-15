@@ -3,10 +3,11 @@ import pandas as pd
 from Data import getData
 from BackTest import ChartTrade, Performance
 import mplfinance as mpf
+from talib.abstract import SMA
 
 # 取得回測資料
 prod = '0050'
-data = getData(prod, '2013-01-01', '2022-05-01')
+data = getData(prod, '2014-01-01', '2025-10-14')
 
 # 計算簡單移動平均線
 data['ma1'] = SMA(data, timeperiod=90)

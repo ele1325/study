@@ -7,7 +7,7 @@ from talib.abstract import RSI
 
 # 取得回測資料
 prod = '0050'
-data = getData(prod, '2013-01-01', '2022-05-01')
+data = getData(prod, '2014-01-01', '2025-10-14')
 
 # 計算相對強弱指標 以及 買超 賣超
 data['rsi'] = RSI(data, timeperiod=10)

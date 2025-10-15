@@ -6,7 +6,7 @@ import mplfinance as mpf
 
 # 取得回測資料
 prod = '0050'
-data = getPriceAndInstInvest_FM(prod, '2019-05-01', '2022-05-01')
+data = getPriceAndInstInvest_FM(prod, '2019-05-01', '2025-10-14')
 
 # 計算 投信平均買賣
 data['D_day'] = data['自營商買進股數(自行買賣)']-data['自營商賣出股數(自行買賣)']

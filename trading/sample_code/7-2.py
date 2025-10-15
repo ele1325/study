@@ -6,7 +6,7 @@ import mplfinance as mpf
 
 # 取得回測資料
 prod='0050'
-data=getPriceAndShareHolder(prod,'2007-01-01','2022-05-01')
+data=getPriceAndShareHolder(prod,'2007-01-01','2025-10-14')
 
 # 30張持有以下稱為散戶
 data['minority']=data['1']+data['2']+data['3']+data['4']+data['5']

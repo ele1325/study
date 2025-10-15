@@ -7,7 +7,7 @@ from talib.abstract import MACD
 
 # 取得回測資料
 prod = '0050'
-data = getData(prod, '2013-01-01', '2022-05-01')
+data = getData(prod, '2014-01-01', '2025-10-14')
 
 # 計算MACD
 data = data.join(MACD(data, 40, 120, 60))

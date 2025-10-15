@@ -6,7 +6,7 @@ import mplfinance as mpf
 
 # 取得回測資料
 prod = '0050'
-data = getData(prod, '2013-01-01', '2022-05-01')
+data = getData(prod, '2014-01-01', '2025-10-14')
 
 # 計算前N根K最高價
 data['ceil'] = data.rolling(3)['high'].max().shift()

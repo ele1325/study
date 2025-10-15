@@ -16,7 +16,7 @@ for prod in stocks:
     
     # 取得回測資料
     try:
-        data = getData(prod, '2010-01-01', '2022-05-01')
+        data = getData(prod, '2010-01-01', '2025-10-14')
     except:
         continue
 
